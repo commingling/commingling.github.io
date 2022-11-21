@@ -16,13 +16,13 @@ git init
 git add -A
 git commit -m 'deploy'
 
-# 如果发布到 https://<USERNAME>.github.io
-# git push -f git@github.com:<USERNAME>/<USERNAME>.github.io.git master
+# 如果发布到 https://<commingling>.github.io
+git push -f git@github.com:commingling/commingling.github.io.git master
 
-# 如果发布到 https://<USERNAME>.github.io/<REPO>
-# git push -f git@github.com:<USERNAME>/<REPO>.git master:gh-pages
+# 如果发布到 https://<commingling>.github.io/<commingling.github.io>
+git push -f git@github.com:commingling/commingling.github.io.git master:gh-pages
 
-# 把上面的 <USERNAME> 换成你自己的 Github 用户名，<REPO> 换成仓库名，比如我这里就是：
-git push -f git@github.com:wtyqer/blog.git master:gh-pages
+# 把上面的 <commingling> 换成你自己的 Github 用户名，<commingling.github.io> 换成仓库名，比如我这里就是：
+#git push -f git@github.com:wtyqer/blog.git master:gh-pages
 
 cd -
