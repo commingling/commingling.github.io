@@ -1,0 +1,15 @@
+{
+  "name": "commingling.github.io",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/commingling/commingling.github.io.git",
+  "author": "liubaoming8 <liubaoming8@jd.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^1.9.7"
+  },
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  }
+}
