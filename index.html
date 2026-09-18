@@ -1,140 +1,595 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>commingling | Java Backend Engineer</title>
-    <meta name="description" content="commingling - Java backend engineer focused on backend systems, distributed systems, and engineering reliability." />
-    <link rel="canonical" href="https://commingling.github.io/" />
-    <meta name="theme-color" content="#0f172a" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://commingling.github.io/" />
-    <meta property="og:title" content="commingling | Java Backend Engineer" />
-    <meta property="og:description" content="Java backend engineering notes, project practice, and systems thinking." />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="commingling | Java Backend Engineer" />
-    <meta name="twitter:description" content="Java backend engineering notes, project practice, and systems thinking." />
-    <style>
-      :root {
-        color-scheme: light;
-        --text: #0f172a;
-        --muted: #475569;
-        --line: #e2e8f0;
-        --panel: #f8fafc;
-        --accent: #2563eb;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>commingling | 资深 Java 后端工程师 · 分布式系统与架构实践</title>
+  <meta name="description" content="commingling - 资深 Java 后端工程师与系统架构实践者。专注高并发支付系统、DDD 领域驱动设计、分布式事务一致性与高可用稳定性治理。" />
+  <meta name="keywords" content="Java后端, 系统架构, 分布式系统, 支付系统, DDD领域驱动设计, 高并发, 软考架构师, commingling" />
+  <meta name="author" content="commingling" />
+  <link rel="canonical" href="https://commingling.github.io/" />
 
-      * {
-        box-sizing: border-box;
-      }
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
 
-      body {
-        margin: 0;
-        min-height: 100vh;
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        color: var(--text);
-        background: #ffffff;
-      }
+  <!-- Open Graph / Meta -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://commingling.github.io/" />
+  <meta property="og:title" content="commingling | 资深 Java 后端工程师 · 分布式系统与架构实践" />
+  <meta property="og:description" content="专注高并发支付系统、DDD 领域驱动设计、分布式事务一致性与工程稳定性治理。" />
+  <meta property="og:image" content="https://commingling.github.io/assets/favicon.svg" />
 
-      main {
-        width: min(920px, calc(100% - 40px));
-        margin: 0 auto;
-        padding: 72px 0;
-      }
+  <!-- Twitter Meta -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="commingling | 资深 Java 后端工程师 · 分布式系统与架构实践" />
+  <meta name="twitter:description" content="专注高并发支付系统、DDD 领域驱动设计、分布式事务一致性与工程稳定性治理。" />
+  <meta name="twitter:image" content="https://commingling.github.io/assets/favicon.svg" />
 
-      header {
-        padding-bottom: 40px;
-        border-bottom: 1px solid var(--line);
-      }
+  <!-- Preconnect and Stylesheet -->
+  <link rel="stylesheet" href="/assets/style.css" />
 
-      h1 {
-        margin: 0 0 16px;
-        font-size: clamp(36px, 8vw, 72px);
-        line-height: 1;
-        letter-spacing: 0;
-      }
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "mainEntity": {
+      "@type": "Person",
+      "name": "commingling",
+      "jobTitle": "Senior Java Backend Engineer",
+      "url": "https://commingling.github.io",
+      "sameAs": [
+        "https://github.com/commingling",
+        "https://github.com/commingling/commingling.github.io"
+      ],
+      "knowsAbout": [
+        "Java",
+        "Distributed Systems",
+        "Domain-Driven Design",
+        "Payment Architecture",
+        "High Concurrency",
+        "Performance Optimization"
+      ]
+    }
+  }
+  </script>
+</head>
+<body>
 
-      .lead {
-        max-width: 720px;
-        margin: 0;
-        color: var(--muted);
-        font-size: 20px;
-        line-height: 1.7;
-      }
+  <!-- Top Navigation Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#" class="brand" aria-label="commingling 首页">
+        <div class="brand-icon">
+          <svg viewBox="0 0 64 64" fill="none">
+            <rect width="64" height="64" rx="14" fill="#2563eb" />
+            <path d="M18 20 L30 32 L18 44" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="34" y1="44" x2="46" y2="44" stroke="#60a5fa" stroke-width="5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span>commingling</span>
+      </a>
 
-      section {
-        padding: 36px 0;
-        border-bottom: 1px solid var(--line);
-      }
-
-      h2 {
-        margin: 0 0 18px;
-        font-size: 18px;
-        letter-spacing: 0;
-      }
-
-      ul {
-        display: grid;
-        gap: 12px;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-      }
-
-      li {
-        padding: 14px 16px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--panel);
-        color: var(--muted);
-        line-height: 1.6;
-      }
-
-      a {
-        color: var(--accent);
-        font-weight: 700;
-        text-decoration: none;
-      }
-
-      a:hover {
-        text-decoration: underline;
-      }
-
-      footer {
-        padding-top: 32px;
-        color: #64748b;
-        font-size: 14px;
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <header>
-        <h1>commingling</h1>
-        <p class="lead">Java backend engineer focused on backend systems, distributed systems, engineering reliability, and long-term maintainability.</p>
-      </header>
-
-      <section>
-        <h2>Focus</h2>
-        <ul>
-          <li>Backend system design with clear boundaries, stable contracts, and maintainable service layers.</li>
-          <li>Distributed systems practice, including consistency, idempotency, observability, and failure recovery.</li>
-          <li>Performance work across database access, caching, asynchronous processing, and operational feedback loops.</li>
+      <nav aria-label="主导航">
+        <ul class="nav-links">
+          <li><a href="#focus" class="nav-link">核心领域</a></li>
+          <li><a href="#architecture" class="nav-link">架构实践</a></li>
+          <li><a href="#projects" class="nav-link">精选项目</a></li>
+          <li><a href="#stack" class="nav-link">技术矩阵</a></li>
+          <li><a href="#about" class="nav-link">关于</a></li>
         </ul>
-      </section>
+      </nav>
 
-      <section>
-        <h2>Public Work</h2>
-        <ul>
-          <li><a href="https://github.com/commingling/commingling">GitHub Profile README</a></li>
-          <li><a href="https://github.com/commingling/commingling.github.io">This GitHub Pages repository</a></li>
-          <li><a href="https://github.com/commingling/huimin-studio-site">Huimin Studio public site deployment</a></li>
+      <div class="header-actions">
+        <!-- Theme Switcher -->
+        <button id="theme-toggle" class="icon-btn" type="button" title="切换深色/浅色模式" aria-label="切换深色/浅色模式">
+          <!-- Sun Icon (shown in dark mode) -->
+          <svg id="sun-icon" style="display:none; width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <!-- Moon Icon (shown in light mode) -->
+          <svg id="moon-icon" style="display:block; width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <!-- GitHub Profile -->
+        <a href="https://github.com/commingling" target="_blank" rel="noopener noreferrer" class="icon-btn" title="查看 GitHub Profile" aria-label="GitHub Profile">
+          <svg style="width:19px; height:19px;" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <div class="status-pill">
+          <span class="pulse-dot"></span>
+          <span>System Architecture & Engineering Reliability</span>
+        </div>
+
+        <h1>
+          构建高可靠支付链路与<br />
+          <span class="hero-highlight">可演进的分布式系统</span>
+        </h1>
+
+        <p class="hero-lead">
+          聚焦 Java 后端、分布式事务一致性、DDD 领域驱动建模与高并发性能优化。善于将异构复杂业务抽象为边界清晰、可监控、可自愈的工程方案，实现稳定性与吞吐量的可量化跃升。
+        </p>
+
+        <!-- Engineering Metrics -->
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-value">-70%+</div>
+            <div class="metric-label">P99 延迟深度治理</div>
+            <div class="metric-desc">全链路火焰图压测调优与热点缓存隔离</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">99.99%</div>
+            <div class="metric-label">分布式账单一致性</div>
+            <div class="metric-desc">防重幂等、可靠事件驱动与异步对账闭环</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">10万+</div>
+            <div class="metric-label">日均订单交易支撑</div>
+            <div class="metric-desc">生产环境峰值平稳运行，零资损事故</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value">99.98%</div>
+            <div class="metric-label">核心业务 SLA</div>
+            <div class="metric-desc">熔断降级自愈与高可用监控告警大盘</div>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#architecture" class="btn btn-primary">
+            <span>探索架构实战</span>
+            <svg style="width:16px; height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a href="#projects" class="btn btn-secondary">精选开源工程</a>
+          <button class="btn btn-secondary" type="button" onclick="copyText('commingling', '已复制 GitHub 账号: @commingling')">
+            <span>复制 GitHub @commingling</span>
+            <svg style="width:15px; height:15px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Focus Areas Section -->
+    <section id="focus" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">Core Competencies</span>
+          <h2 class="section-title">核心专业领域与架构能力</h2>
+          <p class="section-subtitle">沉淀于大规模复杂系统实践的工程方法论，聚焦稳定性、可维护性与高吞吐量设计。</p>
+        </div>
+
+        <div class="cards-grid">
+          <!-- Card 1: 支付系统 -->
+          <div class="focus-card">
+            <div class="focus-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                <line x1="1" y1="10" x2="23" y2="10"></line>
+              </svg>
+            </div>
+            <h3>支付系统与交易链路</h3>
+            <p>主导多渠道支付网关与订单核心流转。设计状态机保障生命周期严格递进，实现分布式防重幂等、动态渠道路由选择与多阶段异步账单对账。</p>
+            <ul class="tags-list">
+              <li class="tag">状态机设计</li>
+              <li class="tag">分布式幂等</li>
+              <li class="tag">对账闭环</li>
+              <li class="tag">异常补偿</li>
+            </ul>
+          </div>
+
+          <!-- Card 2: DDD 领域驱动 -->
+          <div class="focus-card">
+            <div class="focus-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+            </div>
+            <h3>DDD 领域驱动设计</h3>
+            <p>面对业务爆炸式增长，划定清晰的限界上下文（Bounded Contexts），提炼订单、支付、履约等聚合根（Aggregates），通过防腐层（ACL）解耦外部异构服务。</p>
+            <ul class="tags-list">
+              <li class="tag">聚合根拆分</li>
+              <li class="tag">充血模型</li>
+              <li class="tag">防腐层 ACL</li>
+              <li class="tag">业务中台化</li>
+            </ul>
+          </div>
+
+          <!-- Card 3: 分布式一致性与高并发 -->
+          <div class="focus-card">
+            <div class="focus-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+              </svg>
+            </div>
+            <h3>分布式一致性与高并发治理</h3>
+            <p>在读多写少与突发流量下，结合本地消息表、MQ 可靠投递保障最终一致性。利用多级缓存（Caffeine + Redis Cluster）与热点隔离提升吞吐量。</p>
+            <ul class="tags-list">
+              <li class="tag">最终一致性</li>
+              <li class="tag">多级缓存</li>
+              <li class="tag">慢SQL调优</li>
+              <li class="tag">Sentinel限流</li>
+            </ul>
+          </div>
+
+          <!-- Card 4: 工程稳定性与可观测性 -->
+          <div class="focus-card">
+            <div class="focus-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+            </div>
+            <h3>工程可靠性与可观测性</h3>
+            <p>构建全链路追踪（SkyWalking / OpenTelemetry）与基于 Prometheus/Grafana 的核心指标监控大盘。严格推行发布金丝雀灰度、接口契约与故障复盘机制。</p>
+            <ul class="tags-list">
+              <li class="tag">链路追踪</li>
+              <li class="tag">Prometheus告警</li>
+              <li class="tag">灰度发布</li>
+              <li class="tag">应急预案</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture Case Studies Section -->
+    <section id="architecture" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">Case Studies</span>
+          <h2 class="section-title">架构设计与实战沉淀</h2>
+          <p class="section-subtitle">从业务痛点到工程落地的架构决策与技术演进复盘。</p>
+        </div>
+
+        <!-- Case 1: 全球支付交易系统重构 -->
+        <div class="case-card">
+          <div class="case-header">
+            <div>
+              <span class="case-badge">核心系统重构 · 支付与结算</span>
+              <h3 class="case-title" style="margin-top: 8px;">全球化高并发交易与多渠道支付网关架构</h3>
+            </div>
+            <span class="tag">Dubbo3 · Redis Cluster · Kafka · TiDB · Seata</span>
+          </div>
+
+          <p class="case-desc">
+            业务面对跨境交易与多家国际异构渠道对接，旧系统跨国请求延迟高、网络超时频发导致状态挂死、对账差错率高。通过重构交易核心，建立高可用、低延迟、强一致的支付路由与治理闭环。
+          </p>
+
+          <div class="case-details-grid">
+            <div class="case-detail-col">
+              <h4>🎯 核心挑战与痛点</h4>
+              <p>异构渠道协议各异；跨国弱网波动导致接口超时率攀升；分布式事务锁开销大；日终对账数据量大且差错处理缺乏自动化手段。</p>
+            </div>
+            <div class="case-detail-col">
+              <h4>⚡ 核心架构方案</h4>
+              <p>设计状态机统一管控订单生命周期；基于成功率与费率权重的动态智能路由；采用 Redis Lua 预扣减 + 本地事务 + 事务消息保障资金安全；离线异步批量对账引擎秒级排查。</p>
+            </div>
+            <div class="case-detail-col">
+              <h4>📊 量化业务收益</h4>
+              <p>核心报价与支付计算链路 P99 延迟显著降低 70%+；系统整体吞吐量提升 3 倍；对账差异率长期稳定在 0.01% 以下，SLA 达到 99.98%。</p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="tag">技术决策权衡：选择本地消息表+MQ最终一致性，以异步化削峰降低同步事务阻塞</span>
+            <span class="tag">风控防刷：基于滑动窗口与 Token Bucket 的接口级分布式限流</span>
+          </div>
+        </div>
+
+        <!-- Case 2: 系统架构设计师知识闭环体系 -->
+        <div class="case-card">
+          <div class="case-header">
+            <div>
+              <span class="case-badge">知识工程 · 系统架构方法论</span>
+              <h3 class="case-title" style="margin-top: 8px;">软考高级·系统架构设计师体系化知识闭环工程</h3>
+            </div>
+            <span class="tag">Obsidian · ATAM · 软件质量属性 · 云原生架构</span>
+          </div>
+
+          <p class="case-desc">
+            系统架构设计师涵盖从计算机体系结构、数据库设计、分布式与微服务架构、质量属性评估（ATAM/SAAM）到论文实战论据。通过构建结构化知识图谱与数字化备考站点，打通理论框架与工程实践的映射桥梁。
+          </p>
+
+          <div class="case-details-grid">
+            <div class="case-detail-col">
+              <h4>🎯 知识工程目标</h4>
+              <p>将庞杂的软考架构师考纲解构为「综合知识速记脑图 + 案例分析典型模式库 + 架构论文骨架论据」，形成高内聚知识闭环。</p>
+            </div>
+            <div class="case-detail-col">
+              <h4>⚡ 核心沉淀内容</h4>
+              <p>总结高可用、高性能、安全性等质量属性设计战术；提炼微服务与云原生架构权衡决策模型；构建万能论文骨架与 10 个关键工程论据体系。</p>
+            </div>
+            <div class="case-detail-col">
+              <h4>📊 开源成果与交付</h4>
+              <p>在 GitHub 完整开源知识库体系与静态备考站点，支持双链检索、真题考点串联与思维导图可视化，为架构师体系学习提供开箱即用工具。</p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <a href="https://github.com/commingling/soft-exam-architect" target="_blank" rel="noopener noreferrer" class="tag" style="text-decoration:none; color:var(--accent); font-weight:600;">
+              👉 查看 GitHub: commingling/soft-exam-architect
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Projects Section -->
+    <section id="projects" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">Public Work & Open Source</span>
+          <h2 class="section-title">精选开源与实践工程</h2>
+          <p class="section-subtitle">持续开源的架构知识库、开发者提效工具与 Web 工程项目。</p>
+        </div>
+
+        <div class="projects-grid">
+          <!-- Project 1: soft-exam-architect -->
+          <a href="https://github.com/commingling/soft-exam-architect" target="_blank" rel="noopener noreferrer" class="project-card">
+            <div class="project-top">
+              <div class="project-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+              </div>
+              <span class="project-ext-icon">
+                <svg style="width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </span>
+            </div>
+            <h3>soft-exam-architect</h3>
+            <p>软考高级·系统架构设计师 Obsidian 知识库 + 备考网站。包含极简冲刺脑图、论文骨架与万能句、案例分析典型场景题库解法。</p>
+            <ul class="tags-list">
+              <li class="tag">系统架构</li>
+              <li class="tag">Obsidian</li>
+              <li class="tag">备考知识库</li>
+              <li class="tag">开源</li>
+            </ul>
+          </a>
+
+          <!-- Project 2: jetbrains-cc-gui -->
+          <a href="https://github.com/commingling/jetbrains-cc-gui" target="_blank" rel="noopener noreferrer" class="project-card">
+            <div class="project-top">
+              <div class="project-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="3" y1="9" x2="21" y2="9"></line>
+                  <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+              </div>
+              <span class="project-ext-icon">
+                <svg style="width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </span>
+            </div>
+            <h3>jetbrains-cc-gui</h3>
+            <p>JetBrains IDE AI 辅助工具插件，无缝集成 Claude Code 与 Codex GUI，提升编码研发流中的智能代码评审与架构探索效率。</p>
+            <ul class="tags-list">
+              <li class="tag">JetBrains Plugin</li>
+              <li class="tag">Claude Code</li>
+              <li class="tag">开发者效能</li>
+            </ul>
+          </a>
+
+          <!-- Project 3: Nexus-Editor -->
+          <a href="https://github.com/commingling/Nexus-Editor" target="_blank" rel="noopener noreferrer" class="project-card">
+            <div class="project-top">
+              <div class="project-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6"></polyline>
+                  <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+              </div>
+              <span class="project-ext-icon">
+                <svg style="width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </span>
+            </div>
+            <h3>Nexus-Editor</h3>
+            <p>现代交互式文本与代码编辑器项目，探索流畅轻量的编辑体验与自定义语法扩展，注重代码结构化与快速渲染性能。</p>
+            <ul class="tags-list">
+              <li class="tag">Editor</li>
+              <li class="tag">前端工程</li>
+              <li class="tag">轻量级</li>
+            </ul>
+          </a>
+
+          <!-- Project 4: huimin-studio-site -->
+          <a href="https://commingling.github.io/huimin-studio-site/" target="_blank" rel="noopener noreferrer" class="project-card">
+            <div class="project-top">
+              <div class="project-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+              </div>
+              <span class="project-ext-icon">
+                <svg style="width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </span>
+            </div>
+            <h3>Huimin Studio Web</h3>
+            <p>Huimin Studio 官方网站部署与展示工程，具备现代排版交互设计，依托 GitHub Pages 与 GitHub Actions 自动化静态交付。</p>
+            <ul class="tags-list">
+              <li class="tag">Production Site</li>
+              <li class="tag">GitHub Pages</li>
+              <li class="tag">React / Vite</li>
+            </ul>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech Stack Matrix Section -->
+    <section id="stack" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">Skillset & Tools</span>
+          <h2 class="section-title">技术栈与工程实践矩阵</h2>
+          <p class="section-subtitle">熟练掌握并应用于企业级生产环境的工具、中间件与基础设施。</p>
+        </div>
+
+        <div class="stack-matrix">
+          <div class="stack-group">
+            <h4>
+              <svg style="width:18px; height:18px; color:var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+              后端与分布式框架
+            </h4>
+            <div class="stack-items">
+              <span class="stack-badge">Java (17 / 21)</span>
+              <span class="stack-badge">JVM 性能分析</span>
+              <span class="stack-badge">JUC 并发编程</span>
+              <span class="stack-badge">Spring Boot</span>
+              <span class="stack-badge">Spring Cloud</span>
+              <span class="stack-badge">Apache Dubbo3</span>
+              <span class="stack-badge">Seata (AT/TCC)</span>
+              <span class="stack-badge">Sentinel 限流</span>
+            </div>
+          </div>
+
+          <div class="stack-group">
+            <h4>
+              <svg style="width:18px; height:18px; color:var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+              存储与消息中间件
+            </h4>
+            <div class="stack-items">
+              <span class="stack-badge">MySQL / 索引深度优化</span>
+              <span class="stack-badge">Redis Cluster / Lua</span>
+              <span class="stack-badge">Apache Kafka</span>
+              <span class="stack-badge">TiDB 分布式数据库</span>
+              <span class="stack-badge">RabbitMQ</span>
+              <span class="stack-badge">Elasticsearch</span>
+              <span class="stack-badge">MyBatis-Plus</span>
+            </div>
+          </div>
+
+          <div class="stack-group">
+            <h4>
+              <svg style="width:18px; height:18px; color:var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+              云原生与工程效能
+            </h4>
+            <div class="stack-items">
+              <span class="stack-badge">Docker 容器化</span>
+              <span class="stack-badge">Linux 性能排查</span>
+              <span class="stack-badge">GitHub Actions CI/CD</span>
+              <span class="stack-badge">GitFlow 分支规范</span>
+              <span class="stack-badge">Nginx 反向代理</span>
+              <span class="stack-badge">SonarQube 代码扫描</span>
+            </div>
+          </div>
+
+          <div class="stack-group">
+            <h4>
+              <svg style="width:18px; height:18px; color:var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+              可观测性与治理
+            </h4>
+            <div class="stack-items">
+              <span class="stack-badge">SkyWalking 链路追踪</span>
+              <span class="stack-badge">Prometheus 核心指标</span>
+              <span class="stack-badge">Grafana 大盘监控</span>
+              <span class="stack-badge">ELK 日志规范治理</span>
+              <span class="stack-badge">JMeter 压力测试</span>
+              <span class="stack-badge">Async-Profiler 火焰图</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">About & Contact</span>
+          <h2 class="section-title">关于与工程协作</h2>
+        </div>
+
+        <div style="max-width: 760px; line-height: 1.8; color: var(--text-secondary);">
+          <p style="margin-bottom: 16px;">
+            你好，我是 <strong>commingling</strong>。作为一名专注于后端体系建设的工程师，我热衷于探索分布式系统的可靠性边界、状态机在复杂交易链路中的纯粹表达，以及高质量工程实践带来的生产效能提升。
+          </p>
+          <p style="margin-bottom: 24px;">
+            本主页为纯静态部署（GitHub Pages），遵循隐私保护规范，不含任何外部第三方追踪代码，提供毫秒级极速访问体验。欢迎就 Java 后端架构、支付系统稳定性、系统架构师备考以及分布式设计展开技术交流。
+          </p>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="https://github.com/commingling" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+              <svg style="width:18px; height:18px;" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+              </svg>
+              <span>访问 GitHub 主页</span>
+            </a>
+            <a href="https://github.com/commingling/commingling.github.io" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+              <span>本站源码仓库</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-text">
+          <p>© 2026 <strong>commingling</strong> · Built with Modern Standards & Pure Privacy.</p>
+          <p style="font-size: 0.8rem; margin-top: 4px;">Deployed via <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a> · 零外部追踪 · 极速毫秒呈现</p>
+        </div>
+
+        <ul class="footer-links">
+          <li><a href="#focus" class="footer-link">核心领域</a></li>
+          <li><a href="#architecture" class="footer-link">架构实践</a></li>
+          <li><a href="#projects" class="footer-link">开源工程</a></li>
+          <li><a href="https://commingling.github.io/sitemap.xml" class="footer-link">Sitemap</a></li>
+          <li><a href="https://github.com/commingling" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub</a></li>
         </ul>
-      </section>
+      </div>
+    </div>
+  </footer>
 
-      <footer>
-        Public profile page for <a href="https://github.com/commingling">@commingling</a>.
-      </footer>
-    </main>
-  </body>
+  <!-- Interactive JavaScript -->
+  <script src="/assets/script.js"></script>
+</body>
 </html>

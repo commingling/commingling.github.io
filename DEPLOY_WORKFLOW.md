@@ -1,65 +1,30 @@
-# Deploy Workflow
+# Deployment Workflow
 
-This document describes how to deploy the Portfolio frontend to `commingling.github.io` (GitHub Pages).
+本仓库托管于 GitHub Pages，承载个人技术主页 [https://commingling.github.io](https://commingling.github.io)。
 
-## Overview
+## 架构与部署模式
 
-Because `commingling.github.io` is a static hosting service, we need to build the `Portfolio` React application locally and then push the generated static files (HTML, JS, CSS) to this repository.
+- **架构选型**：现代化纯静态架构（Modern Vanilla HTML5 + CSS3 + ES6），零外部庞杂构建依赖。
+- **发布方式**：直接提交至 `main` 分支，GitHub Pages 自动检测并即时发布（通常 15~30 秒内生效）。
+- **隐私合规**：全站内容遵循隐私保护规范，不含未经脱敏的真实个人与机构标识，不设第三方数据追踪。
 
-The backend API runs separately on Google Cloud Run (`portfolio-site-1024456695830.us-central1.run.app`).
+## 日常更新步骤
 
-## Deployment Steps
+1. **修改代码或样式**：
+   - 首页内容：直接编辑 `index.html`
+   - 全局样式与主题：直接编辑 `assets/style.css`
+   - 交互与主题引擎：直接编辑 `assets/script.js`
+   - 图标与资源：存放在 `assets/`
 
-1.  **Prepare Build Environment**
-    Create a temporary directory (e.g., `build_env`) and copy the source code from your local `Portfolio` project.
+2. **本地预览测试**：
+   ```bash
+   python3 -m http.server 8000
+   # 打开 http://localhost:8000 即可实时体验与验证
+   ```
 
-2.  **Configure for Production**
-    Before building, you must ensure the frontend knows where to send API requests. By default, it might use relative paths (`/api/chat`), but on GitHub Pages, it needs the absolute URL of your Cloud Run backend.
-
-    *   **File**: `src/components/ChatWidget.tsx` (and any other API consumers)
-    *   **Change**: Replace `/api/chat` with `https://portfolio-site-1024456695830.us-central1.run.app/api/chat`.
-
-    *Note: Ensure your Cloud Run backend has CORS enabled for `commingling.github.io`.*
-
-3.  **Build the Project**
-    Run the Vite build command in the temporary directory:
-    ```bash
-    npm install  # if node_modules are not linked
-    npm run build
-    ```
-    This generates a `dist/` folder containing the production assets.
-
-4.  **Deploy Artifacts**
-    Copy the contents of the `dist/` folder to the root of the `commingling.github.io` repository.
-    *   `dist/index.html` -> `./index.html`
-    *   `dist/assets/*` -> `./assets/*`
-
-5.  **Push to GitHub**
-    Commit and push the changes:
-    ```bash
-    git add .
-    git commit -m "Deploy updated portfolio"
-    git push origin main
-    ```
-
-## Automated Script (Reference)
-
-You can use a script similar to this to automate the process:
-
-```bash
-# 1. Create temp dir
-mkdir build_tmp
-# 2. Copy source
-cp -R ../Portfolio/src ../Portfolio/*.{ts,tsx,html,json} build_tmp/
-# 3. Patch API URL (Example using sed on Mac)
-sed -i '' "s|/api/chat|https://portfolio-site-1024456695830.us-central1.run.app/api/chat|g" build_tmp/src/components/ChatWidget.tsx
-# 4. Build
-cd build_tmp
-npm install
-npm run build
-# 5. Move artifacts
-cp -R dist/* ../
-# 6. Cleanup
-cd ..
-rm -rf build_tmp
-```
+3. **提交并推送至 GitHub**：
+   ```bash
+   git add .
+   git commit -m "docs: update profile and architecture highlights"
+   git push origin main
+   ```
