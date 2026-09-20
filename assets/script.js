@@ -1,11 +1,11 @@
 /**
- * commingling.github.io - Theme & Interactive Engine
+ * commingling.github.io - Theme, Navigation & Advanced Interactive Engine
  */
 
 (function () {
   'use strict';
 
-  // Theme Management
+  // 1. Theme Management
   const STORAGE_KEY = 'commingling_theme';
   const themeToggleBtn = document.getElementById('theme-toggle');
   const sunIcon = document.getElementById('sun-icon');
@@ -41,17 +41,15 @@
     });
   }
 
-  // Listen for system theme changes if user hasn't explicitly set a preference
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
     if (!localStorage.getItem(STORAGE_KEY)) {
       applyTheme(e.matches ? 'dark' : 'light');
     }
   });
 
-  // Copy to Clipboard with Toast Notification
+  // 2. Clipboard Copy & Toast Feedback
   window.copyText = function (text, message) {
     if (!navigator.clipboard) {
-      // Fallback
       const textArea = document.createElement('textarea');
       textArea.value = text;
       document.body.appendChild(textArea);
@@ -86,5 +84,113 @@
     setTimeout(() => {
       toast.classList.remove('show');
     }, 2400);
+  }
+
+  // 3. Interactive Architecture Pipeline Inspector
+  const pipeNodes = document.querySelectorAll('.pipe-node');
+  const pipeTitle = document.getElementById('inspector-title');
+  const pipeRole = document.getElementById('inspector-role');
+  const pipeTech = document.getElementById('inspector-tech');
+  const pipeFail = document.getElementById('inspector-fail');
+  const pipeSla = document.getElementById('inspector-sla');
+
+  if (pipeNodes.length > 0) {
+    pipeNodes.forEach(node => {
+      node.addEventListener('click', () => {
+        pipeNodes.forEach(n => n.classList.remove('active'));
+        node.classList.add('active');
+
+        if (pipeTitle && node.dataset.title) pipeTitle.textContent = node.dataset.title;
+        if (pipeRole && node.dataset.role) pipeRole.textContent = node.dataset.role;
+        if (pipeTech && node.dataset.tech) pipeTech.textContent = node.dataset.tech;
+        if (pipeFail && node.dataset.fail) pipeFail.textContent = node.dataset.fail;
+        if (pipeSla && node.dataset.sla) pipeSla.textContent = node.dataset.sla;
+      });
+    });
+  }
+
+  // 4. Decision Matrix Tabs
+  const decisionTabs = document.querySelectorAll('.tab-btn');
+  const decisionPanels = document.querySelectorAll('.matrix-panel');
+
+  if (decisionTabs.length > 0) {
+    decisionTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        decisionTabs.forEach(t => t.classList.remove('active'));
+        decisionPanels.forEach(p => (p.style.display = 'none'));
+
+        tab.classList.add('active');
+        const targetId = tab.dataset.target;
+        const targetPanel = document.getElementById(targetId);
+        if (targetPanel) {
+          targetPanel.style.display = 'block';
+        }
+      });
+    });
+  }
+
+  // 5. Project Category Filter Chips
+  const filterChips = document.querySelectorAll('.filter-chip');
+  const projectCards = document.querySelectorAll('.project-card');
+
+  if (filterChips.length > 0) {
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        filterChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+
+        const filter = chip.dataset.filter;
+        projectCards.forEach(card => {
+          if (filter === 'all' || card.dataset.category === filter) {
+            card.classList.remove('is-hidden');
+          } else {
+            card.classList.add('is-hidden');
+          }
+        });
+      });
+    });
+  }
+
+  // 6. ScrollSpy & Back-to-Top Button
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+  const backToTopBtn = document.getElementById('back-to-top');
+
+  function handleScroll() {
+    const scrollPos = window.pageYOffset || document.documentElement.scrollTop;
+
+    // ScrollSpy
+    sections.forEach(section => {
+      const top = section.offsetTop - 120;
+      const height = section.offsetHeight;
+      const id = section.getAttribute('id');
+
+      if (scrollPos >= top && scrollPos < top + height) {
+        navLinks.forEach(link => {
+          if (link.getAttribute('href') === `#${id}`) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      }
+    });
+
+    // Back to top visibility
+    if (backToTopBtn) {
+      if (scrollPos > 320) {
+        backToTopBtn.classList.add('visible');
+      } else {
+        backToTopBtn.classList.remove('visible');
+      }
+    }
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+
+  if (backToTopBtn) {
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   }
 })();

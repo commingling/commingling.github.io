@@ -73,7 +73,8 @@
       <nav aria-label="主导航">
         <ul class="nav-links">
           <li><a href="#focus" class="nav-link">核心领域</a></li>
-          <li><a href="#architecture" class="nav-link">架构实践</a></li>
+          <li><a href="#architecture" class="nav-link">架构实战</a></li>
+          <li><a href="#decisions" class="nav-link">决策权衡</a></li>
           <li><a href="#projects" class="nav-link">精选项目</a></li>
           <li><a href="#stack" class="nav-link">技术矩阵</a></li>
           <li><a href="#about" class="nav-link">关于</a></li>
@@ -161,6 +162,7 @@
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
           </a>
+          <a href="#decisions" class="btn btn-secondary">决策权衡模型</a>
           <a href="#projects" class="btn btn-secondary">精选开源工程</a>
           <button class="btn btn-secondary" type="button" onclick="copyText('commingling', '已复制 GitHub 账号: @commingling')">
             <span>复制 GitHub @commingling</span>
@@ -282,6 +284,128 @@
             业务面对跨境交易与多家国际异构渠道对接，旧系统跨国请求延迟高、网络超时频发导致状态挂死、对账差错率高。通过重构交易核心，建立高可用、低延迟、强一致的支付路由与治理闭环。
           </p>
 
+          <!-- Interactive Pipeline Visualization -->
+          <div class="arch-pipeline-wrapper">
+            <div class="arch-pipeline-title">
+              <span>💳 全链路支付事务与状态演进流程</span>
+              <span class="hint">（点击节点查看节点架构防御与指标）</span>
+            </div>
+
+            <div class="arch-pipeline-track">
+              <!-- Step 1 -->
+              <div class="pipe-node active"
+                   data-title="01. 请求入口与网关防护"
+                   data-role="接入层治理：流量清洗、鉴权验签、单 IP 滑动窗口防刷限流。"
+                   data-tech="Nginx + OpenResty + Redis Token Bucket"
+                   data-fail="突发热点流量自动排队削峰，恶意重放请求秒级阻断拦截。"
+                   data-sla="网关转发延迟 < 2ms | 支撑大促秒级十万订单接入">
+                <span class="pipe-step-num">STEP 01</span>
+                <span class="pipe-title">请求入口网关</span>
+                <span class="pipe-tag">Token Bucket</span>
+              </div>
+
+              <div class="pipe-arrow">→</div>
+
+              <!-- Step 2 -->
+              <div class="pipe-node"
+                   data-title="02. 分布式防重与幂等层"
+                   data-role="分布式防并发提交：基于业务唯一订单编号加锁锁定业务态。"
+                   data-tech="Redis SETNX + Lua 脚本预扣减 + DB 唯一业务索引"
+                   data-fail="重复提交立即响应正在处理中，彻底杜绝并发重复扣款与脏写。"
+                   data-sla="幂等拦截率 100% | 判定耗时 < 1.5ms">
+                <span class="pipe-step-num">STEP 02</span>
+                <span class="pipe-title">防重幂等校验</span>
+                <span class="pipe-tag">Redis Lua</span>
+              </div>
+
+              <div class="pipe-arrow">→</div>
+
+              <!-- Step 3 -->
+              <div class="pipe-node"
+                   data-title="03. 状态机与领域编排"
+                   data-role="生命周期严密管控：严格管理 Init → Processing → Success / Fail 转换。"
+                   data-tech="DDD 充血模型 + 状态机引擎 + 本地事务"
+                   data-fail="拦截一切非法的逆向或跳跃式状态迁移，保持数据一致性。"
+                   data-sla="状态流转零挂死 | 严格单向状态图保护">
+                <span class="pipe-step-num">STEP 03</span>
+                <span class="pipe-title">核心状态机</span>
+                <span class="pipe-tag">State Machine</span>
+              </div>
+
+              <div class="pipe-arrow">→</div>
+
+              <!-- Step 4 -->
+              <div class="pipe-node"
+                   data-title="04. 智能动态渠道路由"
+                   data-role="渠道路由优选：综合各渠道历史成功率、实时网络 RTT 与费率成本分流。"
+                   data-tech="Dubbo3 + 加权动态负载均衡 + 自适应熔断器"
+                   data-fail="渠道抖动时秒级将流量平滑倾斜至备选通道，用户完全无感知。"
+                   data-sla="综合支付成功率从 96.2% 跃升至 99.98%">
+                <span class="pipe-step-num">STEP 04</span>
+                <span class="pipe-title">动态路由选择</span>
+                <span class="pipe-tag">Dynamic Routing</span>
+              </div>
+
+              <div class="pipe-arrow">→</div>
+
+              <!-- Step 5 -->
+              <div class="pipe-node"
+                   data-title="05. 可靠事件与事务消息"
+                   data-role="跨系统异步解耦：支付终态确认后，可靠驱动下游风控、履约与积分系统。"
+                   data-tech="本地消息表 (Local Message Table) + Kafka 可靠投递"
+                   data-fail="生产端防丢失与定时对账补发，消费端幂等去重，死信告警。"
+                   data-sla="消息可靠投递率 99.999% | 核心链路异步化解耦">
+                <span class="pipe-step-num">STEP 05</span>
+                <span class="pipe-title">可靠事件总线</span>
+                <span class="pipe-tag">Kafka / Event</span>
+              </div>
+
+              <div class="pipe-arrow">→</div>
+
+              <!-- Step 6 -->
+              <div class="pipe-node"
+                   data-title="06. 异步对账与自动差错补偿"
+                   data-role="资金安全闭环：T+1 离线银行账单批量拉取、多维度差错核对与自动平账。"
+                   data-tech="TiDB 分布式分析 + 批量对账引擎 + 异常补偿工单"
+                   data-fail="长款/短款自动生成逆向冲正与人工审核工单，保障资损为零。"
+                   data-sla="对账差异率 < 0.01% | 资金风险秒级感知监控">
+                <span class="pipe-step-num">STEP 06</span>
+                <span class="pipe-title">对账与自动补偿</span>
+                <span class="pipe-tag">Settlement Recon</span>
+              </div>
+            </div>
+
+            <!-- Dynamic Inspector Box -->
+            <div class="pipe-inspector">
+              <div class="pipe-inspector-header">
+                <div class="pipe-inspector-title">
+                  <svg style="width:18px; height:18px; color:var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <span id="inspector-title">01. 请求入口与网关防护</span>
+                </div>
+                <span class="badge-green">当前选中节点</span>
+              </div>
+
+              <div class="pipe-inspector-grid">
+                <div class="pipe-field">
+                  <h5>🛡️ 架构职责与定位</h5>
+                  <p id="inspector-role">接入层治理：流量清洗、鉴权验签、单 IP 滑动窗口防刷限流。</p>
+                </div>
+                <div class="pipe-field">
+                  <h5>⚙️ 核心技术栈</h5>
+                  <p id="inspector-tech">Nginx + OpenResty + Redis Token Bucket</p>
+                </div>
+                <div class="pipe-field">
+                  <h5>🚨 容灾与降级机制</h5>
+                  <p id="inspector-fail">突发热点流量自动排队削峰，恶意重放请求秒级阻断拦截。</p>
+                </div>
+                <div class="pipe-field">
+                  <h5>📈 核心 SLA 指标</h5>
+                  <p id="inspector-sla">网关转发延迟 &lt; 2ms | 支撑大促秒级十万订单接入</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="case-details-grid">
             <div class="case-detail-col">
               <h4>🎯 核心挑战与痛点</h4>
@@ -295,11 +419,6 @@
               <h4>📊 量化业务收益</h4>
               <p>核心报价与支付计算链路 P99 延迟显著降低 70%+；系统整体吞吐量提升 3 倍；对账差异率长期稳定在 0.01% 以下，SLA 达到 99.98%。</p>
             </div>
-          </div>
-
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <span class="tag">技术决策权衡：选择本地消息表+MQ最终一致性，以异步化削峰降低同步事务阻塞</span>
-            <span class="tag">风控防刷：基于滑动窗口与 Token Bucket 的接口级分布式限流</span>
           </div>
         </div>
 
@@ -317,25 +436,215 @@
             系统架构设计师涵盖从计算机体系结构、数据库设计、分布式与微服务架构、质量属性评估（ATAM/SAAM）到论文实战论据。通过构建结构化知识图谱与数字化备考站点，打通理论框架与工程实践的映射桥梁。
           </p>
 
-          <div class="case-details-grid">
-            <div class="case-detail-col">
-              <h4>🎯 知识工程目标</h4>
-              <p>将庞杂的软考架构师考纲解构为「综合知识速记脑图 + 案例分析典型模式库 + 架构论文骨架论据」，形成高内聚知识闭环。</p>
-            </div>
-            <div class="case-detail-col">
-              <h4>⚡ 核心沉淀内容</h4>
-              <p>总结高可用、高性能、安全性等质量属性设计战术；提炼微服务与云原生架构权衡决策模型；构建万能论文骨架与 10 个关键工程论据体系。</p>
-            </div>
-            <div class="case-detail-col">
-              <h4>📊 开源成果与交付</h4>
-              <p>在 GitHub 完整开源知识库体系与静态备考站点，支持双链检索、真题考点串联与思维导图可视化，为架构师体系学习提供开箱即用工具。</p>
-            </div>
+          <!-- Interactive Accordion for Soft Exam Knowledge -->
+          <div class="accordion-group">
+            <details class="accordion-item" open>
+              <summary class="accordion-summary">
+                <span>📘 01. 软件架构质量属性与 ATAM 评估模型</span>
+                <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </summary>
+              <div class="accordion-content">
+                <p>架构设计本质是对<strong>质量属性（Quality Attributes）</strong>的权衡与取舍。在系统架构设计师考纲中，核心聚焦以下六大属性战术：</p>
+                <ul>
+                  <li><strong>性能 (Performance)</strong>：资源调度、计算异步化、热点分流、多级缓存（本地 Caffeine + 集中式 Redis）、数据库读写分离与索引优化。</li>
+                  <li><strong>可用性 (Availability)</strong>：心跳检测、双机热备、集群无状态化、故障转移、服务熔断降级（Sentinel）与幂等自愈。</li>
+                  <li><strong>安全性 (Security)</strong>：身份鉴权、非对称签名防篡改、参数白名单与 SQL 防注入、敏感数据脱敏加密存储。</li>
+                  <li><strong>ATAM 架构评估模型</strong>：通过效用树（Utility Tree）梳理优先级，精准识别系统的<strong>敏感点（Sensitivity Points）</strong>、<strong>权衡点（Trade-off Points）</strong>与<strong>风险点</strong>。</li>
+                </ul>
+              </div>
+            </details>
+
+            <details class="accordion-item">
+              <summary class="accordion-summary">
+                <span>🏛️ 02. 现代分布式与云原生架构演进</span>
+                <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </summary>
+              <div class="accordion-content">
+                <p>传统单体向微服务与云原生转型的架构模式沉淀：</p>
+                <ul>
+                  <li><strong>服务解耦与治理</strong>：基于 Dubbo3 / Spring Cloud 的服务发现与 RPC 编排，API 网关负责路由分发与鉴权。</li>
+                  <li><strong>分布式数据层</strong>：分库分表键（Sharding Key）设计、分布式自增 ID（优化版 Snowflake 防时钟回拨）、TiDB HTAP 混合架构。</li>
+                  <li><strong>云原生三要素</strong>：基于 Docker/K8s 容器化编排、声明式 API 与 Service Mesh 流量治理。</li>
+                </ul>
+              </div>
+            </details>
+
+            <details class="accordion-item">
+              <summary class="accordion-summary">
+                <span>✍️ 03. 架构论文黄金三段论与万能工程论据库</span>
+                <svg class="accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </summary>
+              <div class="accordion-content">
+                <p>提炼系统架构论文写作的高分骨架，直击阅卷核心得分点：</p>
+                <ul>
+                  <li><strong>摘要模板</strong>：[本人于某年参与某大型分布式系统项目，担任核心架构设计职责] + [面对海量并发与异构业务，采用了 DDD 建模/最终一致性/微服务治理方案] + [实践证明系统平稳度过线上考验，各项指标达标，取得显著商业价值]。</li>
+                  <li><strong>核心关键词体系</strong>：DDD 限界上下文、CQRS 读写分离、CAP/BASE 定理权衡、滑动窗口限流、双写最终一致性、幂等防重。</li>
+                </ul>
+              </div>
+            </details>
           </div>
 
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <a href="https://github.com/commingling/soft-exam-architect" target="_blank" rel="noopener noreferrer" class="tag" style="text-decoration:none; color:var(--accent); font-weight:600;">
-              👉 查看 GitHub: commingling/soft-exam-architect
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px;">
+            <a href="https://github.com/commingling/soft-exam-architect" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size:0.88rem; padding:8px 16px;">
+              👉 查看完整开源仓库: soft-exam-architect
             </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture Decision Matrix Section -->
+    <section id="decisions" class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-badge">Engineering Trade-offs</span>
+          <h2 class="section-title">架构选型与权衡决策模型</h2>
+          <p class="section-subtitle">资深架构师的核心壁垒在于对复杂场景下「利弊取舍」的精准把握。</p>
+        </div>
+
+        <div class="decision-tabs">
+          <button class="tab-btn active" type="button" data-target="matrix-tx">分布式事务选型权衡</button>
+          <button class="tab-btn" type="button" data-target="matrix-cache">缓存与数据库一致性</button>
+          <button class="tab-btn" type="button" data-target="matrix-idempotency">高并发接口防重与幂等</button>
+        </div>
+
+        <!-- Matrix Panel 1: 分布式事务 -->
+        <div id="matrix-tx" class="matrix-panel" style="display:block;">
+          <div class="matrix-table-container">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>方案类型</th>
+                  <th>业务侵入性</th>
+                  <th>吞吐量与延迟影响</th>
+                  <th>一致性级别</th>
+                  <th>补偿与回滚成本</th>
+                  <th>推荐业务场景</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>本地消息表 + MQ</strong></td>
+                  <td><span class="badge-green">中等</span></td>
+                  <td><span class="badge-green">极小 (异步解耦)</span></td>
+                  <td>最终一致性 (BASE)</td>
+                  <td>简单 (重试+人工补偿)</td>
+                  <td><strong>支付成功后发货、积分增减、风控通知等异步链路</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Seata AT 模式</strong></td>
+                  <td><span class="badge-green">极低 (注解级)</span></td>
+                  <td><span class="badge-yellow">中等 (全局锁排队)</span></td>
+                  <td>准强一致性</td>
+                  <td>自动化 (全局事务回滚)</td>
+                  <td><strong>中台内部微服务间读多写少、跨库更新订单表</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>TCC (Try-Confirm-Cancel)</strong></td>
+                  <td><span class="badge-yellow">极高 (需手写3个方法)</span></td>
+                  <td><span class="badge-green">小 (业务自持锁)</span></td>
+                  <td>强最终一致性</td>
+                  <td>业务自主严格补偿</td>
+                  <td><strong>核心资金划扣、跨机构账务冻结与解冻</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>SAGA 长事务</strong></td>
+                  <td><span class="badge-yellow">高 (需定义补偿动作)</span></td>
+                  <td><span class="badge-green">小 (无隔离性阻塞)</span></td>
+                  <td>最终一致性</td>
+                  <td>逆向补偿流程</td>
+                  <td><strong>长周期跨部门履约、机票酒店复合打包预订</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Matrix Panel 2: 缓存一致性 -->
+        <div id="matrix-cache" class="matrix-panel" style="display:none;">
+          <div class="matrix-table-container">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>方案类型</th>
+                  <th>写入性能</th>
+                  <th>脏读时间窗口</th>
+                  <th>实现复杂度</th>
+                  <th>极端并发击穿防护</th>
+                  <th>推荐业务场景</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Cache Aside (先更库再删缓存)</strong></td>
+                  <td><span class="badge-green">极高</span></td>
+                  <td><span class="badge-green">微秒级 (极短)</span></td>
+                  <td><span class="badge-green">极低</span></td>
+                  <td>配合互斥锁 / 逻辑过期</td>
+                  <td><strong>绝大多数读多写少的基础业务数据、配置中心</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>延迟双删 (Del -> DB -> Sleep -> Del)</strong></td>
+                  <td><span class="badge-yellow">中等 (受Sleep耗时影响)</span></td>
+                  <td><span class="badge-green">极短</span></td>
+                  <td><span class="badge-green">较低</span></td>
+                  <td>可缓解主从延迟引发的脏读</td>
+                  <td><strong>存在 MySQL 主从复制延迟 (Replica Lag) 的中小型系统</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Canal 监听 Binlog 异步刷新</strong></td>
+                  <td><span class="badge-green">最高 (业务无需删缓存)</span></td>
+                  <td><span class="badge-yellow">取决于 MQ 消费时延</span></td>
+                  <td><span class="badge-yellow">中高 (需维护 Canal 集群)</span></td>
+                  <td>异步兜底平滑无毛刺</td>
+                  <td><strong>核心商品详情页、千万级大促主数据多级缓存同步</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Matrix Panel 3: 接口防重与幂等 -->
+        <div id="matrix-idempotency" class="matrix-panel" style="display:none;">
+          <div class="matrix-table-container">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>方案类型</th>
+                  <th>并发阻断能力</th>
+                  <th>网络开销</th>
+                  <th>时钟与死锁风险</th>
+                  <th>回滚容错机制</th>
+                  <th>典型应用场景</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>数据库唯一索引 (Unique Index)</strong></td>
+                  <td><span class="badge-green">强一致性 (兜底之王)</span></td>
+                  <td><span class="badge-green">零额外网络通信</span></td>
+                  <td>无死锁风险</td>
+                  <td>事务自然回滚</td>
+                  <td><strong>流水号防重、防重复建单、对账表主键</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Redis 分布式锁 (SETNX + Lua)</strong></td>
+                  <td><span class="badge-green">毫秒级提前拦截</span></td>
+                  <td>微量 Redis RTT (1~2ms)</td>
+                  <td>需配置合理租期与 Watchdog</td>
+                  <td>finally 块中安全释放锁</td>
+                  <td><strong>秒杀减库存、订单支付前置排重校验</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>前置 Token 令牌机制</strong></td>
+                  <td><span class="badge-green">请求发出前阻断</span></td>
+                  <td>增加一次 Token 获取请求</td>
+                  <td>Token 消费即失效，无死锁</td>
+                  <td>业务失败需根据需要恢复</td>
+                  <td><strong>前端表单防手抖连续点击、防浏览器多次刷新</strong></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -350,9 +659,17 @@
           <p class="section-subtitle">持续开源的架构知识库、开发者提效工具与 Web 工程项目。</p>
         </div>
 
+        <!-- Filter Chips -->
+        <div class="filter-tabs">
+          <button class="filter-chip active" type="button" data-filter="all">全部 (All)</button>
+          <button class="filter-chip" type="button" data-filter="arch">系统架构 (Architecture)</button>
+          <button class="filter-chip" type="button" data-filter="tools">开发者工具 (Dev Tools)</button>
+          <button class="filter-chip" type="button" data-filter="web">Web 站点 (Production Web)</button>
+        </div>
+
         <div class="projects-grid">
           <!-- Project 1: soft-exam-architect -->
-          <a href="https://github.com/commingling/soft-exam-architect" target="_blank" rel="noopener noreferrer" class="project-card">
+          <a href="https://github.com/commingling/soft-exam-architect" target="_blank" rel="noopener noreferrer" class="project-card" data-category="arch">
             <div class="project-top">
               <div class="project-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -379,7 +696,7 @@
           </a>
 
           <!-- Project 2: jetbrains-cc-gui -->
-          <a href="https://github.com/commingling/jetbrains-cc-gui" target="_blank" rel="noopener noreferrer" class="project-card">
+          <a href="https://github.com/commingling/jetbrains-cc-gui" target="_blank" rel="noopener noreferrer" class="project-card" data-category="tools">
             <div class="project-top">
               <div class="project-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -406,7 +723,7 @@
           </a>
 
           <!-- Project 3: Nexus-Editor -->
-          <a href="https://github.com/commingling/Nexus-Editor" target="_blank" rel="noopener noreferrer" class="project-card">
+          <a href="https://github.com/commingling/Nexus-Editor" target="_blank" rel="noopener noreferrer" class="project-card" data-category="tools">
             <div class="project-top">
               <div class="project-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -432,7 +749,7 @@
           </a>
 
           <!-- Project 4: huimin-studio-site -->
-          <a href="https://commingling.github.io/huimin-studio-site/" target="_blank" rel="noopener noreferrer" class="project-card">
+          <a href="https://commingling.github.io/huimin-studio-site/" target="_blank" rel="noopener noreferrer" class="project-card" data-category="web">
             <div class="project-top">
               <div class="project-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -569,6 +886,13 @@
     </section>
   </main>
 
+  <!-- Floating Back to Top Button -->
+  <button id="back-to-top" class="back-to-top" type="button" title="回到顶部" aria-label="回到顶部">
+    <svg style="width:20px; height:20px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
   <!-- Footer -->
   <footer class="site-footer">
     <div class="container">
@@ -580,7 +904,8 @@
 
         <ul class="footer-links">
           <li><a href="#focus" class="footer-link">核心领域</a></li>
-          <li><a href="#architecture" class="footer-link">架构实践</a></li>
+          <li><a href="#architecture" class="footer-link">架构实战</a></li>
+          <li><a href="#decisions" class="footer-link">决策模型</a></li>
           <li><a href="#projects" class="footer-link">开源工程</a></li>
           <li><a href="https://commingling.github.io/sitemap.xml" class="footer-link">Sitemap</a></li>
           <li><a href="https://github.com/commingling" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub</a></li>
